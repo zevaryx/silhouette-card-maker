@@ -294,16 +294,23 @@ def add_front_back_pages(front_page: Image.Image, back_page: Image.Image, pages:
 
 def build_arg_str(**kwargs) -> str:
     arg_str = []
+
     for name, value in kwargs.items():
         if value is None or not value:
             continue
+
         arg_str.append(f"--{name}")
+        
         if not isinstance(value, bool):
             if isinstance(value, Enum):
+                # Enums need the Enum.MEMBER.value extracted
                 value = value.value
             elif isinstance(value, list):
+                # This is for specifically --skip
                 value = ", ".join(value)
+
             arg_str.append(str(value))
+
     return " ".join(arg_str)
 
 def generate_pdf(
@@ -326,7 +333,7 @@ def generate_pdf(
 ):
     # Generage the PDF arguments string
     arg_str = build_arg_str(**locals())
-    
+
     # Sanity checks for the different directories
     f_path = Path(front_dir_path)
     if not f_path.exists() or not f_path.is_dir():
